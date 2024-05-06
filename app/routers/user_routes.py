@@ -259,3 +259,18 @@ async def verify_email(user_id: UUID, token: str, db: AsyncSession = Depends(get
     if await UserService.verify_email_with_token(db, user_id, token):
         return {"message": "Email verified successfully"}
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired verification token")
+
+@router.get("/conversion-rate/", tags=["Analytics"])
+async def conversion_rate(db: AsyncSession = Depends(get_db)):
+    """
+    Calculate the conversion rate of anonymous users becoming authenticated users.
+    """
+    total_anonymous_users = await UserService.count_anonymous_users(db)
+    total_authenticated_users = await UserService.count_authenticated_users(db)
+
+    if total_anonymous_users == 0:
+        conversion_rate = 0
+    else:
+        conversion_rate = (total_authenticated_users / total_anonymous_users) * 100
+
+    return {"conversion_rate": conversion_rate}
