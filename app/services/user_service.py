@@ -202,9 +202,9 @@ class UserService:
     @classmethod
     async def count(cls, session: AsyncSession) -> int:
         """
-        Count the total number of users in the database.
+        Count the total number of non-admin users in the database.
         """
-        query = select(func.count()).select_from(User)
+        query = select(func.count()).where(User.role != UserRole.ADMIN)
         result = await session.execute(query)
         count = result.scalar()
         return count
