@@ -198,3 +198,29 @@ class UserService:
             await session.commit()
             return True
         return False
+
+    @classmethod
+    async def count_anonymous_users(cls, session: AsyncSession) -> int:
+        """
+        Count the number of anonymous users in the database.
+
+        :param session: The AsyncSession instance for database access.
+        :return: The count of anonymous users.
+        """
+        query = select(func.count()).where(User.role == UserRole.ANONYMOUS)
+        result = await session.execute(query)
+        count = result.scalar()
+        return count
+
+    @classmethod
+    async def count_authenticated_users(cls, session: AsyncSession) -> int:
+        """
+        Count the number of authenticated users in the database.
+
+        :param session: The AsyncSession instance for database access.
+        :return: The count of authenticated users.
+        """
+        query = select(func.count()).where(User.role == UserRole.AUTHENTICATED)
+        result = await session.execute(query)
+        count = result.scalar()
+        return count
