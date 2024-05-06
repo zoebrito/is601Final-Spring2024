@@ -200,14 +200,11 @@ class UserService:
         return False
 
     @classmethod
-    async def count_anonymous_users(cls, session: AsyncSession) -> int:
+    async def count(cls, session: AsyncSession) -> int:
         """
-        Count the number of anonymous users in the database.
-
-        :param session: The AsyncSession instance for database access.
-        :return: The count of anonymous users.
+        Count the total number of users in the database.
         """
-        query = select(func.count()).where(User.role == UserRole.ANONYMOUS)
+        query = select(func.count()).select_from(User)
         result = await session.execute(query)
         count = result.scalar()
         return count

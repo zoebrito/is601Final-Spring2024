@@ -263,14 +263,14 @@ async def verify_email(user_id: UUID, token: str, db: AsyncSession = Depends(get
 @router.get("/conversion-rate/", tags=["Analytics"])
 async def conversion_rate(db: AsyncSession = Depends(get_db)):
     """
-    Calculate the conversion rate of anonymous users becoming authenticated users.
+    Calculate the conversion rate of authenticated users among all users.
     """
-    total_anonymous_users = await UserService.count_anonymous_users(db)
+    total_users = await UserService.count(db)
     total_authenticated_users = await UserService.count_authenticated_users(db)
 
-    if total_anonymous_users == 0:
-        conversion_rate = 0
+    if total_users == 0:
+        conversion_rate = 0  # Avoid division by zero
     else:
-        conversion_rate = (total_authenticated_users / total_anonymous_users) * 100
+        conversion_rate = (total_authenticated_users / total_users) * 100
 
     return {"conversion_rate": conversion_rate}
