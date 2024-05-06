@@ -271,6 +271,6 @@ async def conversion_rate(db: AsyncSession = Depends(get_db)):
     if total_anonymous_users == 0:
         conversion_rate = 0
     else:
-        conversion_rate = min((total_authenticated_users / total_anonymous_users) * 100, 100)
+        conversion_rate = (total_authenticated_users / total_anonymous_users) * 100
 
     return {"conversion_rate": conversion_rate}
