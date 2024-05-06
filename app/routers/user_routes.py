@@ -269,7 +269,7 @@ async def conversion_rate(db: AsyncSession = Depends(get_db)):
     total_authenticated_users = await UserService.count_authenticated_users(db)
 
     if total_anonymous_users == 0:
-        conversion_rate = 0
+        conversion_rate = 100
     else:
         conversion_rate = (total_authenticated_users / total_anonymous_users) * 100
 
