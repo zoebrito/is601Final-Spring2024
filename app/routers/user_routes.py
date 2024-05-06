@@ -92,7 +92,7 @@ async def update_user(user_id: UUID, user_update: UserUpdate, request: Request, 
         email_id = user_update.email
 
     if email_id:
-        user_by_email = await UserService.get_user_by_email(db, email_id)
+        user_by_email = await UserService.get_by_email(db, email_id)
         if user_by_email and user_by_email.id != user_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
     
