@@ -69,7 +69,7 @@ async def get_user(user_id: UUID, request: Request, db: AsyncSession = Depends(g
         created_at=user.created_at,
         updated_at=user.updated_at,
         links=create_user_links(user.id, request),
-        is_professional = user.is_professional
+        is_professional=user.is_professional
     )
 
 # Additional endpoints for update, delete, create, and list users follow a similar pattern, using
@@ -156,6 +156,8 @@ async def create_user(user: UserCreate, request: Request, db: AsyncSession = Dep
         first_name=created_user.first_name,
         last_name=created_user.last_name,
         profile_picture_url=created_user.profile_picture_url,
+        github_profile_url=created_user.github_profile_url,
+        linkedin_profile_url=created_user.linkedin_profile_url,
         nickname=created_user.nickname,
         email=created_user.email,
         role=created_user.role,
