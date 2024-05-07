@@ -161,3 +161,14 @@ async def test_unlock_user_account(db_session, locked_user):
     assert unlocked, "The account should be unlocked"
     refreshed_user = await UserService.get_by_id(db_session, locked_user.id)
     assert not refreshed_user.is_locked, "The user should no longer be locked"
+
+@pytest.mark.asyncio
+async def test_count_authenticated_users(db_session):
+    # Setup: Insert some test data with known count of authenticated users
+    # For example, insert some users with different roles including AUTHENTICATED
+    # Perform action
+    authenticated_users_count = await UserService.count_authenticated_users(db_session)
+    # Define the expected count based on your test setup
+    expected_count = 0  # Adjust this value based on your test data
+    # Assert
+    assert authenticated_users_count == expected_count
