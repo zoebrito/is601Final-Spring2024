@@ -199,3 +199,15 @@ async def test_conversion_rate_endpoint(async_client):
     # Assert
     assert response.status_code == 200
     assert "conversion_rate" in response.json()
+
+@pytest.mark.asyncio
+async def test_user_login_activity_endpoint(async_client):
+    # Setup: Insert test data as needed
+    # Perform action
+    response = await async_client.get("/user-login-activity/")
+    # Assert
+    assert response.status_code == 200
+    assert "24_hours" in response.json()
+    assert "48_hours" in response.json()
+    assert "1_week" in response.json()
+    assert "1_year" in response.json()
