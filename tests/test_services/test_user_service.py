@@ -1,6 +1,6 @@
 from builtins import range
 import pytest
-from sqlalchemy import select
+from sqlalchemy import select, text
 from app.dependencies import get_settings
 from app.models.user_model import User, UserRole
 from app.services.user_service import UserService
@@ -198,4 +198,18 @@ async def test_create_user_missing_fields(async_client, admin_token):
     # Attempt to create a user with missing required fields
     user_data = {"email": "test@example.com"}  # Missing required 'password' field
     response = await async_client.post("/users/", json=user_data, headers={"Authorization": f"Bearer {admin_token}"})
+    assert response.status_code == 422  # Unprocessable Entity
+
+# Fixture to clear the database
+@pytest.fixture
+async def clear_database(db_session):
+    # Implement logic to clear the database
+    # For example, you might delete all user records
+    await db_session.execute(text("DELETE FROM users"))
+    await db_session.commit()
+
+# Updated test with the clear_database fixture
+async def test_get_single_user_empty_db(async_client, admin_token, db_session, clear_database):
+    # Attempt to retrieve a user when the database is empty
+    response = await async_client.get("/users/some_user_id", headers={"Authorization": f"Bearer {admin_token}"})
     assert response.status_code == 422  # Unprocessable Entity
