@@ -190,3 +190,12 @@ async def test_list_users_unauthorized(async_client, user_token):
         headers={"Authorization": f"Bearer {user_token}"}
     )
     assert response.status_code == 403  # Forbidden, as expected for regular user
+
+@pytest.mark.asyncio
+async def test_conversion_rate_endpoint(async_client):
+    # Setup: Insert test data as needed
+    # Perform action
+    response = await async_client.get("/conversion-rate/")
+    # Assert
+    assert response.status_code == 200
+    assert "conversion_rate" in response.json()
