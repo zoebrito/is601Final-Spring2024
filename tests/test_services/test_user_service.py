@@ -193,3 +193,9 @@ async def test_count_users_excluding_admin(db_session):
     total_users_count = await UserService.count(db_session)
     # Assert
     assert total_users_count == 0
+
+async def test_create_user_missing_fields(async_client, admin_token):
+    # Attempt to create a user with missing required fields
+    user_data = {"email": "test@example.com"}  # Missing required 'password' field
+    response = await async_client.post("/users/", json=user_data, headers={"Authorization": f"Bearer {admin_token}"})
+    assert response.status_code == 422  # Unprocessable Entity
