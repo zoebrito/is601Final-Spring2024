@@ -79,4 +79,4 @@ As an administrator, I want to gain insights into user retention and conversion 
 ## Deployment to DockerHub
 Successful deployment of the User Management System to DockerHub.
 
-- Docker Repository: [Link to Docker Repository](https://hub.docker.com/repository/docker/zbrito/is601final-spring2024/general)
+- Docker Repository: [Link to Docker Repository](https://hub.docker.com/r/zbrito/is601final-spring2024)
