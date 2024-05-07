@@ -72,9 +72,9 @@ As an administrator, I want to gain insights into user retention and conversion 
 - Analyze user login activity to identify users who haven't logged in for 24 hours, 48 hours, 1 week, or 1 year.
 
 ## Closed Issues
-- QA Issues: [Link to Closed QA Issues](insert link)
+- QA Issues: [Link to Closed QA Issues](https://github.com/zoebrito/is601Final-Spring2024/issues?q=is%3Aissue+is%3Aclosed)
 - New Tests: [Link to Closed New Tests](insert link)
-- Feature Development: [Link to Closed Feature Issue](insert link)
+- Feature Development: [Link to Features](insert link)
 
 ## Deployment to DockerHub
 Successful deployment of the User Management System to DockerHub.
