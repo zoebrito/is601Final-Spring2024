@@ -108,3 +108,10 @@ def test_user_base_url_invalid(url, user_base_data):
     user_base_data["profile_picture_url"] = url
     with pytest.raises(ValidationError):
         UserBase(**user_base_data)
+
+# Tests for UserListResponse
+def test_user_list_response_valid(user_response_data):
+    user_list_response_data = {"items": [user_response_data], "total": 1, "page": 1, "size": 1, "links": []}
+    user_list_response = UserListResponse(**user_list_response_data)
+    assert user_list_response.total == user_list_response_data["total"]
+    assert user_list_response.page == user_list_response_data["page"]
