@@ -115,3 +115,10 @@ def test_user_list_response_valid(user_response_data):
     user_list_response = UserListResponse(**user_list_response_data)
     assert user_list_response.total == user_list_response_data["total"]
     assert user_list_response.page == user_list_response_data["page"]
+
+# Test for validating email format in UserCreate
+def test_user_create_email_format(user_create_data):
+    # Modify email to an invalid format
+    user_create_data["email"] = "invalid_email_format"
+    with pytest.raises(ValidationError):
+        UserCreate(**user_create_data)
