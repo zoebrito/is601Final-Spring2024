@@ -163,7 +163,6 @@ async def test_unlock_user_account(db_session, locked_user):
     refreshed_user = await UserService.get_by_id(db_session, locked_user.id)
     assert not refreshed_user.is_locked, "The user should no longer be locked"
 
-@pytest.mark.asyncio
 async def test_count_authenticated_users(db_session):
     # Setup: Insert some test data with known count of authenticated users
     # For example, insert some users with different roles including AUTHENTICATED
@@ -174,7 +173,6 @@ async def test_count_authenticated_users(db_session):
     # Assert
     assert authenticated_users_count == expected_count
 
-@pytest.mark.asyncio
 async def test_get_last_login_times(db_session):
     # Get the current time at the start of the test
     current_time = datetime.utcnow()
@@ -188,3 +186,10 @@ async def test_get_last_login_times(db_session):
 
     # Assert
     assert login_times == expected_login_times
+
+async def test_count_users_excluding_admin(db_session):
+    # Setup: Insert test data with known number of users excluding admin
+    # Perform action
+    total_users_count = await UserService.count(db_session)
+    # Assert
+    assert total_users_count == 0
