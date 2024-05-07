@@ -73,10 +73,10 @@ As an administrator, I want to gain insights into user retention and conversion 
 
 ## Closed Issues
 - QA Issues: [Link to Closed QA Issues](https://github.com/zoebrito/is601Final-Spring2024/issues?q=is%3Aissue+is%3Aclosed)
-- New Tests: [Link to Closed New Tests](insert link)
-- Feature Development: [Link to Features](insert link)
+- New Tests: [Link to New Tests](insert link)
+- Feature Development: [Link to Conversion Rate Feature](https://github.com/zoebrito/is601Final-Spring2024/pull/16) and [Link to Login Activity Feature](https://github.com/zoebrito/is601Final-Spring2024/pull/17)
 
 ## Deployment to DockerHub
 Successful deployment of the User Management System to DockerHub.
 
-- Docker Repository: [Link to Docker Repository](insert link)
+- Docker Repository: [Link to Docker Repository](https://hub.docker.com/repository/docker/zbrito/is601final-spring2024/general)
