@@ -1,5 +1,5 @@
 from builtins import Exception, bool, classmethod, int, str
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import secrets
 from typing import Optional, Dict, List
 from pydantic import ValidationError
@@ -221,3 +221,27 @@ class UserService:
         result = await session.execute(query)
         count = result.scalar()
         return count
+
+    @classmethod
+    async def get_last_login_times(cls, session: AsyncSession) -> Dict[str, List[User]]:
+        now = datetime.utcnow()
+        times = {
+            "24_hours": 24,
+            "48_hours": 48,
+            "1_week": 7 * 24,
+            "1_year": 365 * 24
+        }
+        last_login_times = {timeframe: [] for timeframe in times}
+
+        try:
+            for timeframe, hours in times.items():
+                threshold = now - timedelta(hours=hours)
+                query = select(User.id, User.last_login_at).where((User.last_login_at <= threshold) | (User.last_login_at == None))
+                result = await cls._execute_query(session, query)
+                last_login_times[timeframe] = {user_id: last_login for user_id, last_login in result} if result else {}
+
+        except Exception as e:
+            # Handle exceptions here
+            pass
+
+        return last_login_times

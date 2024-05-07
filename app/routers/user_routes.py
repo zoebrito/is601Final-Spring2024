@@ -19,7 +19,6 @@ Key Highlights:
 """
 
 from builtins import dict, int, len, str
-from datetime import timedelta
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -33,6 +32,8 @@ from app.services.jwt_service import create_access_token
 from app.utils.link_generation import create_user_links, generate_pagination_links
 from app.dependencies import get_settings
 from app.services.email_service import EmailService
+from datetime import datetime, timezone, timedelta
+
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 settings = get_settings()
@@ -274,3 +275,40 @@ async def conversion_rate(db: AsyncSession = Depends(get_db)):
         conversion_rate = (total_authenticated_users / total_users) * 100
 
     return {"conversion_rate": conversion_rate}
+
+@router.get("/user-login-activity/", tags=["Analytics"])
+async def user_login_activity(db: AsyncSession = Depends(get_db)):
+    """
+    Analyze user login activity to identify users who haven't logged in for 24 hours, 48 hours, 1 week, or 1 year.
+    """
+    users_last_login = await UserService.get_last_login_times(db)
+    current_time = datetime.now()
+
+    inactive_users = {
+        "24_hours": [],
+        "48_hours": [],
+        "1_week": [],
+        "1_year": []
+    }
+
+    for timeframe, last_logins in users_last_login.items():
+        for user_id, last_login in last_logins.items():
+            if last_login is None:  # If last login is None, user has never logged in
+                if timeframe == "24_hours" or timeframe == "48_hours":
+                    inactive_users[timeframe].append(user_id)
+                elif timeframe == "1_week":
+                    inactive_users["1_week"].append(user_id)
+                elif timeframe == "1_year":
+                    inactive_users["1_year"].append(user_id)
+            else:
+                time_difference = current_time - last_login
+                if timeframe == "24_hours" and time_difference <= timedelta(hours=24):
+                    inactive_users["24_hours"].append(user_id)
+                elif timeframe == "48_hours" and time_difference <= timedelta(hours=48):
+                    inactive_users["48_hours"].append(user_id)
+                elif timeframe == "1_week" and time_difference <= timedelta(weeks=1):
+                    inactive_users["1_week"].append(user_id)
+                elif timeframe == "1_year" and time_difference <= timedelta(days=365):
+                    inactive_users["1_year"].append(user_id)
+
+    return inactive_users
