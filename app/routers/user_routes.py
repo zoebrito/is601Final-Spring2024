@@ -296,6 +296,10 @@ async def user_login_activity(db: AsyncSession = Depends(get_db)):
             if last_login is None:  # If last login is None, user has never logged in
                 if timeframe == "24_hours" or timeframe == "48_hours":
                     inactive_users[timeframe].append(user_id)
+                elif timeframe == "1_week":
+                    inactive_users["1_week"].append(user_id)
+                elif timeframe == "1_year":
+                    inactive_users["1_year"].append(user_id)
             else:
                 time_difference = current_time - last_login
                 if timeframe == "24_hours" and time_difference <= timedelta(hours=24):
