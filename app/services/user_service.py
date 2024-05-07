@@ -236,9 +236,9 @@ class UserService:
         try:
             for timeframe, hours in times.items():
                 threshold = now - timedelta(hours=hours)
-                query = select(User).where(User.last_login_at <= threshold)
+                query = select(User.id, User.last_login_at).where((User.last_login_at <= threshold) | (User.last_login_at == None))
                 result = await cls._execute_query(session, query)
-                last_login_times[timeframe] = result.scalars().all() if result else []
+                last_login_times[timeframe] = {user_id: last_login for user_id, last_login in result} if result else {}
 
         except Exception as e:
             # Handle exceptions here
