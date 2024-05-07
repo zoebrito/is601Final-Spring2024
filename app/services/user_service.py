@@ -226,16 +226,16 @@ class UserService:
     async def get_last_login_times(cls, session: AsyncSession) -> Dict[str, List[User]]:
         now = datetime.utcnow()
         times = {
-            "24_hours": timedelta(hours=24),
-            "48_hours": timedelta(hours=48),
-            "1_week": timedelta(weeks=1),
-            "1_year": timedelta(days=365)
+            "24_hours": 24,
+            "48_hours": 48,
+            "1_week": 7 * 24,
+            "1_year": 365 * 24
         }
         last_login_times = {timeframe: [] for timeframe in times}
 
         try:
-            for timeframe, delta in times.items():
-                threshold = now - delta
+            for timeframe, hours in times.items():
+                threshold = now - timedelta(hours=hours)
                 query = select(User).where(User.last_login_at <= threshold)
                 result = await cls._execute_query(session, query)
                 last_login_times[timeframe] = result.scalars().all() if result else []
