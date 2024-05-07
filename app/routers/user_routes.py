@@ -33,6 +33,8 @@ from app.services.jwt_service import create_access_token
 from app.utils.link_generation import create_user_links, generate_pagination_links
 from app.dependencies import get_settings
 from app.services.email_service import EmailService
+from datetime import timedelta
+
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 settings = get_settings()
@@ -274,3 +276,33 @@ async def conversion_rate(db: AsyncSession = Depends(get_db)):
         conversion_rate = (total_authenticated_users / total_users) * 100
 
     return {"conversion_rate": conversion_rate}
+
+@router.get("/user-login-activity/", tags=["Analytics"])
+async def user_login_activity(db: AsyncSession = Depends(get_db)):
+    """
+    Analyze user login activity to identify users who haven't logged in for 24 hours, 48 hours, 1 week, or 1 year.
+    """
+    users_last_login = await UserService.get_last_login_times(db)
+    current_time = datetime.now()
+
+    inactive_users = {
+        "24_hours": [],
+        "48_hours": [],
+        "1_week": [],
+        "1_year": []
+    }
+
+    for user_id, last_login in users_last_login.items():
+        if last_login is None:
+            continue
+        time_difference = current_time - last_login
+        if time_difference <= timedelta(hours=24):
+            inactive_users["24_hours"].append(user_id)
+        elif time_difference <= timedelta(hours=48):
+            inactive_users["48_hours"].append(user_id)
+        elif time_difference <= timedelta(weeks=1):
+            inactive_users["1_week"].append(user_id)
+        elif time_difference <= timedelta(days=365):
+            inactive_users["1_year"].append(user_id)
+
+    return inactive_users
