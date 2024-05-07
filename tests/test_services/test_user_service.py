@@ -5,6 +5,7 @@ from app.dependencies import get_settings
 from app.models.user_model import User, UserRole
 from app.services.user_service import UserService
 from app.utils.nickname_gen import generate_nickname
+from datetime import datetime
 
 pytestmark = pytest.mark.asyncio
 
@@ -172,3 +173,18 @@ async def test_count_authenticated_users(db_session):
     expected_count = 0  # Adjust this value based on your test data
     # Assert
     assert authenticated_users_count == expected_count
+
+@pytest.mark.asyncio
+async def test_get_last_login_times(db_session):
+    # Get the current time at the start of the test
+    current_time = datetime.utcnow()
+
+    # Setup: Insert test data with known last login times
+    # Perform action
+    login_times = await UserService.get_last_login_times(db_session)
+
+    # Define expected login times based on the current time
+    expected_login_times = {timeframe: {user_id: current_time for user_id in last_logins} for timeframe, last_logins in login_times.items()}
+
+    # Assert
+    assert login_times == expected_login_times
