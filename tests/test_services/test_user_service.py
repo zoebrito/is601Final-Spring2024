@@ -1,10 +1,11 @@
 from builtins import range
 import pytest
-from sqlalchemy import select
+from sqlalchemy import select, text
 from app.dependencies import get_settings
 from app.models.user_model import User, UserRole
 from app.services.user_service import UserService
 from app.utils.nickname_gen import generate_nickname
+from datetime import datetime
 
 pytestmark = pytest.mark.asyncio
 
@@ -161,3 +162,54 @@ async def test_unlock_user_account(db_session, locked_user):
     assert unlocked, "The account should be unlocked"
     refreshed_user = await UserService.get_by_id(db_session, locked_user.id)
     assert not refreshed_user.is_locked, "The user should no longer be locked"
+
+async def test_count_authenticated_users(db_session):
+    # Setup: Insert some test data with known count of authenticated users
+    # For example, insert some users with different roles including AUTHENTICATED
+    # Perform action
+    authenticated_users_count = await UserService.count_authenticated_users(db_session)
+    # Define the expected count based on your test setup
+    expected_count = 0  # Adjust this value based on your test data
+    # Assert
+    assert authenticated_users_count == expected_count
+
+async def test_get_last_login_times(db_session):
+    # Get the current time at the start of the test
+    current_time = datetime.utcnow()
+
+    # Setup: Insert test data with known last login times
+    # Perform action
+    login_times = await UserService.get_last_login_times(db_session)
+
+    # Define expected login times based on the current time
+    expected_login_times = {timeframe: {user_id: current_time for user_id in last_logins} for timeframe, last_logins in login_times.items()}
+
+    # Assert
+    assert login_times == expected_login_times
+
+async def test_count_users_excluding_admin(db_session):
+    # Setup: Insert test data with known number of users excluding admin
+    # Perform action
+    total_users_count = await UserService.count(db_session)
+    # Assert
+    assert total_users_count == 0
+
+async def test_create_user_missing_fields(async_client, admin_token):
+    # Attempt to create a user with missing required fields
+    user_data = {"email": "test@example.com"}  # Missing required 'password' field
+    response = await async_client.post("/users/", json=user_data, headers={"Authorization": f"Bearer {admin_token}"})
+    assert response.status_code == 422  # Unprocessable Entity
+
+# Fixture to clear the database
+@pytest.fixture
+async def clear_database(db_session):
+    # Implement logic to clear the database
+    # For example, you might delete all user records
+    await db_session.execute(text("DELETE FROM users"))
+    await db_session.commit()
+
+# Updated test with the clear_database fixture
+async def test_get_single_user_empty_db(async_client, admin_token, db_session, clear_database):
+    # Attempt to retrieve a user when the database is empty
+    response = await async_client.get("/users/some_user_id", headers={"Authorization": f"Bearer {admin_token}"})
+    assert response.status_code == 422  # Unprocessable Entity

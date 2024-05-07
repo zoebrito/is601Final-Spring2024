@@ -6,6 +6,7 @@ from app.models.user_model import User, UserRole
 from app.utils.nickname_gen import generate_nickname
 from app.utils.security import hash_password
 from app.services.jwt_service import decode_token  # Import your FastAPI app
+from app.routers.user_routes import conversion_rate
 
 # Example of a test function using the async_client fixture
 @pytest.mark.asyncio
@@ -190,3 +191,33 @@ async def test_list_users_unauthorized(async_client, user_token):
         headers={"Authorization": f"Bearer {user_token}"}
     )
     assert response.status_code == 403  # Forbidden, as expected for regular user
+
+@pytest.mark.asyncio
+async def test_conversion_rate_endpoint(async_client):
+    # Setup: Insert test data as needed
+    # Perform action
+    response = await async_client.get("/conversion-rate/")
+    # Assert
+    assert response.status_code == 200
+    assert "conversion_rate" in response.json()
+
+@pytest.mark.asyncio
+async def test_user_login_activity_endpoint(async_client):
+    # Setup: Insert test data as needed
+    # Perform action
+    response = await async_client.get("/user-login-activity/")
+    # Assert
+    assert response.status_code == 200
+    assert "24_hours" in response.json()
+    assert "48_hours" in response.json()
+    assert "1_week" in response.json()
+    assert "1_year" in response.json()
+
+@pytest.mark.asyncio
+async def test_conversion_rate_calculation(db_session):
+    # Setup: Insert test data with authenticated users and total users
+    # Perform action
+    response = await conversion_rate(db_session)
+    conversion_rate_value = response.get("conversion_rate", None)
+    # Assert
+    assert conversion_rate_value == 0  # Assuming there are no non-admin users
