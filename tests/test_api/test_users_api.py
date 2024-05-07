@@ -6,6 +6,7 @@ from app.models.user_model import User, UserRole
 from app.utils.nickname_gen import generate_nickname
 from app.utils.security import hash_password
 from app.services.jwt_service import decode_token  # Import your FastAPI app
+from app.routers.user_routes import conversion_rate
 
 # Example of a test function using the async_client fixture
 @pytest.mark.asyncio
@@ -211,3 +212,12 @@ async def test_user_login_activity_endpoint(async_client):
     assert "48_hours" in response.json()
     assert "1_week" in response.json()
     assert "1_year" in response.json()
+
+@pytest.mark.asyncio
+async def test_conversion_rate_calculation(db_session):
+    # Setup: Insert test data with authenticated users and total users
+    # Perform action
+    response = await conversion_rate(db_session)
+    conversion_rate_value = response.get("conversion_rate", None)
+    # Assert
+    assert conversion_rate_value == 0  # Assuming there are no non-admin users
