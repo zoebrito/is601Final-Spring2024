@@ -69,10 +69,12 @@ class UserService:
             if new_user.role == UserRole.ADMIN:
                 new_user.email_verified = True
 
-            new_user.verification_token = generate_verification_token()
+            else:
+                new_user.verification_token = generate_verification_token()
+                await email_service.send_verification_email(new_user)
+
             session.add(new_user)
             await session.commit()
-            await email_service.send_verification_email(new_user)
             return new_user
         except ValidationError as e:
             logger.error(f"Validation error during user creation: {e}")
