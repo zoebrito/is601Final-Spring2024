@@ -63,19 +63,23 @@ class UserService:
             while await cls.get_by_nickname(session, new_nickname):
                 new_nickname = generate_nickname()
             new_user.nickname = new_nickname
-            logger.info(f"User Role: {new_user.role}")
-            user_count = await cls.count(session)
-            new_user.role = UserRole.ADMIN if user_count == 0 else UserRole.ANONYMOUS            
-            if new_user.role == UserRole.ADMIN:
-                new_user.email_verified = True
 
+            # Fetch the count of non-admin users
+            user_count = await cls.count(session)
+
+            # Check if there are no non-admin users, then the new user becomes admin
+            if user_count == 0:
+                new_user.role = UserRole.ADMIN
+                new_user.email_verified = True
             else:
+                new_user.role = UserRole.ANONYMOUS
                 new_user.verification_token = generate_verification_token()
                 await email_service.send_verification_email(new_user)
 
             session.add(new_user)
             await session.commit()
             return new_user
+
         except ValidationError as e:
             logger.error(f"Validation error during user creation: {e}")
             return None
@@ -202,7 +206,7 @@ class UserService:
         return False
 
     @classmethod
-    async def count(cls, session: AsyncSession) -> int:
+    async def count_non_admin(cls, session: AsyncSession) -> int:
         """
         Count the total number of non-admin users in the database.
         """
