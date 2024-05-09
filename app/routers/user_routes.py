@@ -266,7 +266,7 @@ async def conversion_rate(db: AsyncSession = Depends(get_db)):
     """
     Calculate the conversion rate of authenticated users among all users.
     """
-    total_users = await UserService.count(db)
+    total_users = await UserService.count_non_admin(db)
     total_authenticated_users = await UserService.count_authenticated_users(db)
 
     if total_users == 0:
